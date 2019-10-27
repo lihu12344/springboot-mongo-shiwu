@@ -24,18 +24,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateById(Integer id) throws Exception {
+    public void updateById(Integer id) {
         Query query= Query.query(Criteria.where("id").is(id));
-        User user=mongoTemplate.findOne(query, User.class);
-        System.out.println("更新钱的user为："+user);
-
         Update update=Update.update("name","海贼王");
-        mongoTemplate.upsert(query,update, User.class);
+        mongoTemplate.updateFirst(query,update, User.class);
 
         if(id.equals(2)){
-            throw new Exception("事务回滚");
+            throw new RuntimeException("id为："+id+" 的user对象更新失败，事务回滚");
         }
-
-        System.out.println("更新后的user为："+mongoTemplate.findOne(query, User.class));
     }
 }
